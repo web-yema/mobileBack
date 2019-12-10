@@ -8,11 +8,12 @@ let movieSchema = new mongoose.Schema(
   {
     adminName: String,
     password: String,
-    passwordend: String
+    avatar: String,
+    entryDate: String
   },
   { collection: 'admin' }
-);
-let Admin = mongoose.model('admin', movieSchema);
+)
+let Admin = mongoose.model('admin', movieSchema)
 
 // 轮播图表
 let loopSchema = new mongoose.Schema(
@@ -20,21 +21,54 @@ let loopSchema = new mongoose.Schema(
     image: String
   },
   { collection: 'loop' }
-);
-let Loop = mongoose.model('loop', loopSchema);
+)
+let Loop = mongoose.model('loop', loopSchema)
 
-// // 商品表
-// let commoditySchema = new mongoose.Schema(
+// 商品表
+let commoditySchema = new mongoose.Schema(
+  {
+    name:String,
+    image:String,
+    Price:Number,
+    details:String
+  },
+  { collection: 'commodity' }
+)
+let Commodity = mongoose.model('commodity', commoditySchema)
+
+// 购物车表
+let orderSchema = new mongoose.Schema(
+  {
+    image: String,
+    name: String,
+    entryDate: String,
+    num: Number,
+    status: Number,
+    price: Number
+  },
+  { collection: 'order' }
+)
+let Order = mongoose.model('order', orderSchema)
+
+// 我的课程表
+// let mycommoditySchema = new mongoose.Schema(
 //   {
 //     name:String,
-
+//     image:String,
+//     Price:Number,
+//     entryDate: String
+    
 //   },
-//   { collection: 'loop' }
-// );
-// let Loop = mongoose.model('loop', commoditySchema);
+//   { collection: 'mycommodity' }
+// )
+// let Mycommodity = mongoose.model('mycommodity', mycommoditySchema)
+
 
 // 将表暴露出去
 module.exports = {
   Admin,
-  Loop
+  Loop,
+  Commodity,
+  Order
+  // Mycommodity
 }
