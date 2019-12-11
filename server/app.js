@@ -358,12 +358,17 @@ app.post('/headportrait', upload.single('files'), (req, res, next) => {
 //----------------------------------------------(暂时存放的接口)----------------------------------------------------------------------------------------------//
 // 添加商品
 app.post("/addcommodity", (req, res) => {
-  let { name, image, Price,details } = req.body
+  let { name, image, Price, details, author, entryDate, loop, press, classification } = req.body
   let commodity = new Commodity({
     name,
     image,
     Price,
-    details
+    details,
+    author,
+    entryDate,
+    loop,
+    press,
+    classification
   })
   commodity.save(function (err, ress) {
     if (err) {

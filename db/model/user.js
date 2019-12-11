@@ -24,13 +24,18 @@ let loopSchema = new mongoose.Schema(
 )
 let Loop = mongoose.model('loop', loopSchema)
 
-// 商品表
+// 首页商品表
 let commoditySchema = new mongoose.Schema(
   {
-    name:String,
-    image:String,
-    Price:Number,
-    details:String
+    name:String, // 商品名称
+    image:String, // 商品图片
+    Price:Number, // 商品价格
+    details:String, // 商品详情介绍
+    author:String, // 商品作者
+    entryDate: String, // 上架时间
+    loop:Array, // 商品详情轮播
+    press:String, // 商品出版社
+    classification:String // 商品类别
   },
   { collection: 'commodity' }
 )
@@ -50,7 +55,7 @@ let orderSchema = new mongoose.Schema(
 )
 let Order = mongoose.model('order', orderSchema)
 
-// 我的课程表
+// 我的商品表
 // let mycommoditySchema = new mongoose.Schema(
 //   {
 //     name:String,
