@@ -1,8 +1,8 @@
 //操作数据库的逻辑
 let mongoose = require('mongoose')
 let { db_url } = require('./config')
-mongoose.connect(db_url, { useNewUrlParser: true, useUnifiedTopology: true })
 // connect里面的{ useNewUrlParser: true, useUnifiedTopology: true }必须加，否则不会报错但是有警告
+mongoose.connect(db_url, { useNewUrlParser: true, useUnifiedTopology: true })
 // 用户表
 let movieSchema = new mongoose.Schema(
   {
@@ -15,16 +15,7 @@ let movieSchema = new mongoose.Schema(
 )
 let Admin = mongoose.model('admin', movieSchema)
 
-// 轮播图表
-let loopSchema = new mongoose.Schema(
-  {
-    image: String
-  },
-  { collection: 'loop' }
-)
-let Loop = mongoose.model('loop', loopSchema)
-
-// 首页商品表
+// 商品表
 let commoditySchema = new mongoose.Schema(
   {
     name:String, // 商品名称
@@ -41,6 +32,15 @@ let commoditySchema = new mongoose.Schema(
 )
 let Commodity = mongoose.model('commodity', commoditySchema)
 
+// 轮播图表
+let loopSchema = new mongoose.Schema(
+  {
+    image: String
+  },
+  { collection: 'loop' }
+)
+let Loop = mongoose.model('loop', loopSchema)
+
 // 购物车表
 let orderSchema = new mongoose.Schema(
   {
@@ -55,25 +55,29 @@ let orderSchema = new mongoose.Schema(
 )
 let Order = mongoose.model('order', orderSchema)
 
-// 我的商品表
-// let mycommoditySchema = new mongoose.Schema(
-//   {
-//     name:String,
-//     image:String,
-//     Price:Number,
-//     entryDate: String
+// 我的课程表
+let mycommoditySchema = new mongoose.Schema(
+  {
+    name:String, // 课程名称
+    image:String, // 课程图片
+    Price:Number, // 课程价格
+    details:String, // 课程详情介绍
+    author:String, // 课程作者
+    entryDate: String, // 上架时间
+    press:String, // 课程出版社
+    classification:String // 课程类别
     
-//   },
-//   { collection: 'mycommodity' }
-// )
-// let Mycommodity = mongoose.model('mycommodity', mycommoditySchema)
+  },
+  { collection: 'mycommodity' }
+)
+let Mycommodity = mongoose.model('mycommodity', mycommoditySchema)
 
 
 // 将表暴露出去
 module.exports = {
-  Admin,
-  Loop,
-  Commodity,
-  Order
-  // Mycommodity
+  Admin, // 用户表
+  Loop, // 轮播图表
+  Commodity, //商品表
+  Order, //购物车表
+  Mycommodity // 课程表
 }

@@ -15,7 +15,7 @@ let {
   Loop, // 轮播图表
   Commodity, // 商品表
   Order, // 购物车表
-  // Mycommodity
+  Mycommodity // 我的课程表
 } = require("../db/model/user")
 // 配置静态资源
 app.use(express.static(path.join(__dirname, '../public')))
@@ -46,14 +46,16 @@ app.post("/register", (req, res) => {
     if(regPass.test(user.password)){
       return res.json({ code: "203", message: "密码最少6位，最多16位，包括至少1个大写字母，1个小写字母，1个数字，1个特殊字符(指的是._-)!" })
     }
-    user.save(function (err, ress) {
+    user.save(function (err, ress, doc) {
+      let _id = doc._id
       if (err) {
         return console.log(err)
       }
       res.json({
         code: "200",
         message1: `${ress.adminName}`,
-        message2: `${ress.password}`
+        message2: `${ress.password}`,
+        system: _id
       })
     })
   })
@@ -112,7 +114,6 @@ app.get("/getadmin", (req, res) => {
           res.json({
             code: 200,
             data: {
-              //roles: [ret.power],
               introduction: `I am an ${ret.adminName}`,
               avatar: ret.avatar,
               name: ret.adminName,
@@ -231,6 +232,41 @@ app.post("/commodity", async (req, res) => {
   }
 })
 
+//增加购物车商品
+app.post("/addcommodity", async (req, res) => {
+  let user = req.body
+  let allcommodity = await Order.find({})
+  let maxPage = 10; //每页最大条数
+  let maxpages = Math.ceil(allcommodity.length / maxPage) //设置最大页数
+  try {
+    Order.findOne({ name: user.name }, (err, ret) => {
+      if (err) {
+        return console.log("查询失败!")
+      }
+      if (ret) {
+        return res.json({ code: 203, msg: "该商品已存在!" })
+      }
+      Order.create(user, (err, ress) => {
+        if (err) {
+          console.log(err)
+        } else {
+          res.json({
+            code: 200,
+            msg: "添加成功!",
+            data: ress,
+            maxpages: maxpages //添加的时候要拿到最大的页数，添加完毕后跳转至最大页数
+          });
+        }
+      });
+    });
+  } catch (error) {
+    res.json({
+      code: 211,
+      msg: "连接失败!"
+    })
+  }
+})
+
 //根据商品名称查询商品(模糊查询)
 app.post("/selectcommodity", async (req, res) => {
   let obj = req.body.obj
@@ -274,7 +310,7 @@ app.post("/selectcommodity", async (req, res) => {
   }
 })
 
-//删除商品
+//删除购物车商品
 app.post("/delecommodity", async (req, res) => {
   let Id = req.body
   let commodityList = await Commodity.find(Id, (err, ress) => {
@@ -296,6 +332,107 @@ app.post("/delecommodity", async (req, res) => {
   // 在数据库里能找到_id值 就进行删除
   try {
     Commodity.remove(Id, error => {
+      if (error) {
+        console.log(error)
+      } else {
+        res.json({
+          code: 200,
+          msg: "删除成功!"
+        })
+      }
+    });
+  } catch {
+    res.json({
+      code: 202,
+      msg: "连接删除接口失败!"
+    })
+  }
+})
+
+//获取全部课程和实现分页
+app.post("/mycommodity", async (req, res) => {
+  let { page } = req.body //当前页数
+  let pageSize = 10 //每页显示条目个数
+  try {
+    let mycommodity = await Mycommodity.find({}) //获取所有商品的数据
+    let maxPageHome = Math.ceil(mycommodity.length / pageSize) //最大页数
+    if (page > maxPageHome) {
+      res.json({
+        code: 201,
+        msg: "超过最大页数!"
+      })
+      return false
+    } else {
+      let pagelist = mycommodity.slice((page - 1) * pageSize, page * pageSize)
+      res.json({
+        code: 200,
+        data: pagelist,// 截取的当前页的数据
+        total:mycommodity.length, // 总数据的长度，
+        delpage: Math.ceil(mycommodity.length / pageSize) //页数,在删除时用,当删除的数据是你当前页的最后一条数据的时候,向上取最大页数
+      })
+    }
+  } catch (error) {
+    console.log(error)
+  }
+})
+
+//增加我的课程
+app.post("/addmycommodity", async (req, res) => {
+  let user = req.body
+  let allcommodity = await Mycommodity.find({})
+  let maxPage = 10; //每页最大条数
+  let maxpages = Math.ceil(allcommodity.length / maxPage) //设置最大页数
+  try {
+    Mycommodity.findOne({ name: user.name }, (err, ret) => {
+      if (err) {
+        return console.log("查询失败!")
+      }
+      if (ret) {
+        return res.json({ code: 203, msg: "该课程已存在!" })
+      }
+      Mycommodity.create(user, (err, ress) => {
+        if (err) {
+          console.log(err)
+        } else {
+          res.json({
+            code: 200,
+            msg: "添加成功!",
+            data: ress,
+            maxpages: maxpages //添加的时候要拿到最大的页数，添加完毕后跳转至最大页数
+          });
+        }
+      });
+    });
+  } catch (error) {
+    res.json({
+      code: 211,
+      msg: "连接失败!"
+    })
+  }
+})
+
+//删除我的课程
+app.post("/delemycommodity", async (req, res) => {
+  let Id = req.body
+  let mycommodityList = await Mycommodity.find(Id, (err, ress) => {
+    // 把你当前的_id值放到数据库里查找
+    if (err) {
+      console.log(err)
+    } else {
+      return ress
+    }
+  })
+  if (mycommodityList.length === 0) {
+    // 如果说你输入的_id值在数据库里面没有，就走这里
+    res.json({
+      code: 201,
+      msg: "没有当前项!"
+    })
+    return false
+  }
+  // 在数据库里能找到_id值 就进行删除
+  try {
+    Mycommodity.remove(Id, error => {
       if (error) {
         console.log(error)
       } else {
@@ -351,9 +488,6 @@ app.post('/headportrait', upload.single('files'), (req, res, next) => {
     )
   }
 })
-
-//我的课程
-
 
 //----------------------------------------------(暂时存放的接口)----------------------------------------------------------------------------------------------//
 // 添加商品

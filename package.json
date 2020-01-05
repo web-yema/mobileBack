@@ -3,9 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {
-    "push": "bash deploy.sh"
-  },
+  "scripts": {},
   "keywords": [],
   "author": "",
   "license": "ISC",
